@@ -47,7 +47,7 @@ sub new {
     cacheExpire => $Foswiki::cfg{FeedPlugin}{CacheExpire} || '1 d',
     cacheDir => Foswiki::Func::getWorkArea('FeedPlugin').'/cache',
     timeout => $Foswiki::cfg{FeedPlugin}{TimeOut} || 10,
-    agent => $Foswiki::cfg{FeedPlugin}{Agent} || 'Mozilla/5.0 (compatible; Konqueror/4.5; Linux; X11; en_US) KHTML/4.5.5 (like Gecko) Kubuntu',
+    agent => $Foswiki::cfg{FeedPlugin}{Agent} || 'Mozilla/5.0',
     @_
   }, $class);
 

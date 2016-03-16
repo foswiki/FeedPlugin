@@ -1,14 +1,13 @@
 # ---+ Extensions
 # ---++ FeedPlugin
-# This is the configuration used by the <b>FeedPlugin</b>.
 
-# **BOOLEAN**
-$Foswiki::cfg{FeedPlugin}{Flag} = 1;
+# **STRING EXPERT**
+$Foswiki::cfg{FeedPlugin}{CacheExpire} = '1 d';
 
-# **STRING**
-$Foswiki::cfg{FeedPlugin}{String} = '';
+# **NUMBER EXPERT**
+$Foswiki::cfg{FeedPlugin}{Timeout} = 10;
 
-# **SELECT foo,bar**
-$Foswiki::cfg{FeedPlugin}{Select} = 'foo';
+# **STRING EXPERT**
+$Foswiki::cfg{FeedPlugin}{Agent} = 'Mozilla/5.0';
 
 1;
