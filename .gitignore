@@ -1,0 +1,9 @@
+*.swp
+*,v
+/FeedPlugin.md5
+/FeedPlugin.sha1
+/FeedPlugin.tgz
+/FeedPlugin.txt
+/FeedPlugin.zip
+/FeedPlugin_installer
+/FeedPlugin_installer.pl
