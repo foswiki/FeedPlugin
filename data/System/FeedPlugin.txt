@@ -1,0 +1,117 @@
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1458141724" format="1.1"  version="1"}%
+---+!! %TOPIC%
+%FORMFIELD{"Description"}%
+
+%TOC%
+
+This is a new plugin to render RSS and ATOM feeds from internet sites. It actually is a rework of the old [[Foswiki:Extensions/HeadnlinesPlugin][HeadlinesPlugin]]
+now much leaner and more robust, i.e. facing unicode website feeds. Instead of implementing a RSS parser by its own %TOPIC% hands off duties to CPAN:XML::Feeed 
+and only takes care of caching and integrating results on a Foswiki page.
+
+---++ Examples
+
+List headlines at http://blog.foswiki.org; auto-detect news feed:
+
+<verbatim class="tml">
+%STARTSECTION{"example1"}%
+%FEED{
+   "http://blog.foswiki.org" 
+   detect="on"
+   header="<div class='alt'>$n"
+   footer="$n</div>"
+}%
+%ENDSECTION{"example1"}%
+</verbatim>
+
+%IF{"context FeedPluginEnabled"
+   then="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"example1\"}$percnt"
+}%
+
+Format the most recent posting on the Foswiki Blog:
+
+<verbatim class="tml">
+%STARTSECTION{"example2"}%
+%FEED{
+   "http://blog.foswiki.org/feed/"
+   limit="1"
+   header="<div class='alt'>$n"
+   format="---+!! <div class='foswikiGrayText foswikiRight foswikiNormal'>$issued</div> [[$link][$title]]
+           $content"
+   footer="$n</div>"
+}%
+%ENDSECTION{"example2"}%
+</verbatim>
+
+%IF{"context FeedPluginEnabled"
+   then="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"example2\"}$percnt"
+}%
+
+---++ Syntax
+
+| *Parameter* | *Description* | *Default* |
+| ="..."= or =href="..."= | source url; this can either be a direct link to the RSS/ATOM feed or to the website serving the feed in which case you need to enable =disvover= | |
+| =refresh="..."= | refresh rate for caching the feed; this can be specified using an expiry term such as =1 d= for one day or =1 h= for one hour etc | specified in =$Foswiki::cfg{FeedPlugin}{CacheExpire}=, defaults to =1 d= | 
+| =limit="..."= | maximum items to show | 0 (no limit) |
+| =skip="..."= | number of items in the feed to skip showing the rest | 0 |
+| =header="..."= | format string to be prepended to the list of items in the feed | |
+| =format="..."= | format string for each item on a feed | <code>   * [<nop>[$link][$title]]</code> |
+| =footer="..."= | format string to be appended to the list of items in the feed | |
+| =separator="..."= | format string to separte items in the feed | |
+
+An empty result will be returned when no items have been found in the feed (or all items have been skipped).
+
+The =format= parameter may contain the following variables expanding to respective properties of a feed item:
+
+   * =$author=
+   * =$base=
+   * =$category=
+   * =$content=
+   * =$id=
+   * =$index=
+   * =$issued=, =$issued(&lt;date-format>)=
+   * =$link=
+   * =$modified=, =$modified($lt;date-format>)=
+   * =$summary=
+   * =$tags=
+   * =$title=
+
+In addition the =header=, =format=, =separator= and =footer= format strings may contain:
+
+   * =$feed_author=
+   * =$feed_base=
+   * =$feed_copyright=
+   * =$feed_format=
+   * =$feed_generator=
+   * =$feed_language=
+   * =$feed_link= 
+   * =$feed_modified=, =$feed_modified($lt;date-format>)=
+   * =$feed_tagline=
+   * =$feed_title=
+
+... as well as the standard escapes:
+
+   * =$percnt=
+   * =$dollar=
+   * =$n=
+
+---++ Installation Instructions
+%$INSTALL_INSTRUCTIONS%
+
+---++ Dependencies
+%$DEPENDENCIES%
+
+---++ Change History
+
+%TABLE{columnwidths="7em" tablewidth="100%"}%
+| 16 Mar 2016 | initial release |
+
+%META:FORM{name="PackageForm"}%
+%META:FIELD{name="Author" title="Author" value="%25$CREATED_AUTHOR%25"}%
+%META:FIELD{name="Version" title="Version" value="%25$VERSION%25"}%
+%META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
+%META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
+%META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
+%META:FIELD{name="Copyright" title="Copyright" value="%25$CREATEDYEAR%25, %25$CREATED_AUTHOR%25, All Rights Reserved"}%
+%META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
+%META:FIELD{name="Home" title="Home" value="http://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
+%META:FIELD{name="Support" title="Support" value="http://foswiki.org/Support/%25$ROOTMODULE%25"}%
