@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="" date="1458141724" format="1.1"  version="1"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1458144340" format="1.1" reprev="2" version="3"}%
 ---+!! %TOPIC%
 %FORMFIELD{"Description"}%
 
@@ -49,7 +49,7 @@ Format the most recent posting on the Foswiki Blog:
 ---++ Syntax
 
 | *Parameter* | *Description* | *Default* |
-| ="..."= or =href="..."= | source url; this can either be a direct link to the RSS/ATOM feed or to the website serving the feed in which case you need to enable =disvover= | |
+| ="..."= or =href="..."= | source url; this can either be a direct link to the RSS/ATOM feed or to the website serving the feed in which case you need to enable =discover= | |
 | =refresh="..."= | refresh rate for caching the feed; this can be specified using an expiry term such as =1 d= for one day or =1 h= for one hour etc | specified in =$Foswiki::cfg{FeedPlugin}{CacheExpire}=, defaults to =1 d= | 
 | =limit="..."= | maximum items to show | 0 (no limit) |
 | =skip="..."= | number of items in the feed to skip showing the rest | 0 |
@@ -57,6 +57,7 @@ Format the most recent posting on the Foswiki Blog:
 | =format="..."= | format string for each item on a feed | <code>   * [<nop>[$link][$title]]</code> |
 | =footer="..."= | format string to be appended to the list of items in the feed | |
 | =separator="..."= | format string to separte items in the feed | |
+| =discover="on/off"= | switch on feed discovery starting at the source url | =off= |
 
 An empty result will be returned when no items have been found in the feed (or all items have been skipped).
 
@@ -106,12 +107,12 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 | 16 Mar 2016 | initial release |
 
 %META:FORM{name="PackageForm"}%
-%META:FIELD{name="Author" title="Author" value="%25$CREATED_AUTHOR%25"}%
+%META:FIELD{name="Author" title="Author" value="Michael Daum"}%
 %META:FIELD{name="Version" title="Version" value="%25$VERSION%25"}%
 %META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Copyright" title="Copyright" value="%25$CREATEDYEAR%25, %25$CREATED_AUTHOR%25, All Rights Reserved"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2016, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
 %META:FIELD{name="Home" title="Home" value="http://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Support" title="Support" value="http://foswiki.org/Support/%25$ROOTMODULE%25"}%

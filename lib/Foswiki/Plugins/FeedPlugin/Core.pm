@@ -228,7 +228,7 @@ sub FEED {
 
   my $request = Foswiki::Func::getRequestObject();
   my $doRefresh = $request->param("refresh") || '';
-  $this->_cache->remove(_cache_key($url)) if $refresh =~ /^(on|feed)$/;
+  $this->_cache->remove(_cache_key($url)) if $doRefresh =~ /^(on|feed)$/;
   my $expire = $params->{refresh};
 
   my $error;

@@ -20,7 +20,7 @@ use warnings;
 
 use Foswiki::Func ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our $RELEASE = '08 Jan 2016';
 our $SHORTDESCRIPTION = 'Syndication feed parser';
 our $NO_PREFS_IN_TOPIC = 1;
