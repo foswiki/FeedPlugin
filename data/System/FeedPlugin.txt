@@ -104,6 +104,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+| 18 Mar 2016 | be more robust on feeds not publishing proper dates |
 | 16 Mar 2016 | initial release |
 
 %META:FORM{name="PackageForm"}%

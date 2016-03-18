@@ -262,6 +262,10 @@ sub FEED {
     my $tags = join(", ", $entry->tags()) || '';
     my $content = "<noautokink>".$entry->content->body()."</noautolink>";
     my $summary = $entry->summary->body();
+    my $issued = $entry->issued;
+    $issued = $issued->epoch if defined $issued;
+    my $modified = $entry->modified;
+    $modified = $modified->epoch if defined $modified;
 
     $line =~ s/\$author/$entry->author/g;
     $line =~ s/\$base/$entry->base/ge;
@@ -269,9 +273,9 @@ sub FEED {
     $line =~ s/\$content/$content/g;
     $line =~ s/\$id/$entry->id/ge;
     $line =~ s/\$index/$index/g;
-    $line =~ s/\$issued(?:\((.*?)\))?/Foswiki::Time::formatTime($entry->issued->epoch, $1 || '$day $month $year')/ge;
+    $line =~ s/\$issued(?:\((.*?)\))?/defined($issued)?Foswiki::Time::formatTime($issued, $1 || '$day $month $year'):""/ge;
     $line =~ s/\$link/$entry->link/ge;
-    $line =~ s/\$modified(?:\((.*?)\))?/Foswiki::Time::formatTime($entry->modified->epoch, $1 || '$day $month $year')/ge;
+    $line =~ s/\$modified(?:\((.*?)\))?/defined($modified)?Foswiki::Time::formatTime($modified, $1 || '$day $month $year'):""/ge;
     $line =~ s/\$summary/$summary/g;
     $line =~ s/\$tags/$tags/g;
     $line =~ s/\$title/$entry->title/ge;
