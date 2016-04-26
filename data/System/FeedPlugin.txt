@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1458144340" format="1.1" reprev="2" version="3"}%
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1461663841" format="1.1"  version="1"}%
 ---+!! %TOPIC%
 %FORMFIELD{"Description"}%
 
@@ -10,13 +10,13 @@ and only takes care of caching and integrating results on a Foswiki page.
 
 ---++ Examples
 
-List headlines at http://blog.foswiki.org; auto-detect news feed:
+List headlines at http://blog.foswiki.org; auto-discover news feed:
 
 <verbatim class="tml">
 %STARTSECTION{"example1"}%
 %FEED{
    "http://blog.foswiki.org" 
-   detect="on"
+   discover="on"
    header="<div class='alt'>$n"
    footer="$n</div>"
 }%
@@ -104,6 +104,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+| 24 Apr 2016 | fixed docu; fixed discover mode |
 | 18 Mar 2016 | be more robust on feeds not publishing proper dates |
 | 16 Mar 2016 | initial release |
 
@@ -115,5 +116,5 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Copyright" title="Copyright" value="2016, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
-%META:FIELD{name="Home" title="Home" value="http://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Support" title="Support" value="http://foswiki.org/Support/%25$ROOTMODULE%25"}%
+%META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
+%META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25$ROOTMODULE%25"}%

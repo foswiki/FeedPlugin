@@ -172,7 +172,7 @@ sub _client {
       $proxy .= ':' . $port if $port;
       $ua->proxy([ 'http', 'https' ], $proxy);
 
-      my $proxySkip = $Foswiki::cfg{PROXY}{SkipProxyForDomains};
+      my $proxySkip = $Foswiki::cfg{PROXY}{SkipProxyForDomains} || $Foswiki::cfg{PROXY}{NoProxy};
       if ($proxySkip) {
         my @skipDomains = split(/\s*,\s*/, $proxySkip);
         $ua->no_proxy(@skipDomains);
@@ -217,7 +217,7 @@ sub FEED {
   return _inlineError("Error: no url specified") unless $url;
 
 
-  my $discover = Foswiki::Func::isTrue("discover", 0);
+  my $discover = Foswiki::Func::isTrue($params->{discover}, 0);
   if ($discover) {
     my @feeds = XML::Feed->find_feeds($url);
     return _inlineError("Error: no feeds found") unless @feeds;
@@ -260,7 +260,7 @@ sub FEED {
 
     my $category = join(", ", $entry->category()) || '';
     my $tags = join(", ", $entry->tags()) || '';
-    my $content = "<noautokink>".$entry->content->body()."</noautolink>";
+    my $content = "<noautolink>".$entry->content->body()."</noautolink>";
     my $summary = $entry->summary->body();
     my $issued = $entry->issued;
     $issued = $issued->epoch if defined $issued;
