@@ -169,11 +169,9 @@ sub _client {
 
     my $proxy = $Foswiki::cfg{PROXY}{HOST};
     if ($proxy) {
-      my $port = $Foswiki::cfg{PROXY}{PORT};
-      $proxy .= ':' . $port if $port;
       $ua->proxy([ 'http', 'https' ], $proxy);
 
-      my $proxySkip = $Foswiki::cfg{PROXY}{SkipProxyForDomains} || $Foswiki::cfg{PROXY}{NoProxy};
+      my $proxySkip = $Foswiki::cfg{PROXY}{NoProxy};
       if ($proxySkip) {
         my @skipDomains = split(/\s*,\s*/, $proxySkip);
         $ua->no_proxy(@skipDomains);
@@ -230,7 +228,7 @@ sub FEED {
   my $request = Foswiki::Func::getRequestObject();
   my $doRefresh = $request->param("refresh") || '';
   $this->_cache->remove(_cache_key($url)) if $doRefresh =~ /^(on|feed)$/;
-  my $expire = $params->{refresh};
+  my $expire = $params->{expire} // $params->{refresh};
 
   my $error;
   my $text;
@@ -274,7 +272,7 @@ sub FEED {
     $line =~ s/\$content/$content/g;
     $line =~ s/\$id/_encode($entry->id)/ge;
     $line =~ s/\$index/$index/g;
-    $line =~ s/\$issued(?:\((.*?)\))?/defined($issued)?Foswiki::Time::formatTime($issued, $1 || '$day $month $year'):""/ge;
+    $line =~ s/\$(?:issued|date)(?:\((.*?)\))?/defined($issued)?Foswiki::Time::formatTime($issued, $1 || '$day $month $year'):""/ge;
     $line =~ s/\$link/_encode($entry->link)/ge;
     $line =~ s/\$modified(?:\((.*?)\))?/defined($modified)?Foswiki::Time::formatTime($modified, $1 || '$day $month $year'):""/ge;
     $line =~ s/\$summary/$summary/g;

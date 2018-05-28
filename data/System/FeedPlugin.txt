@@ -35,7 +35,7 @@ Format the most recent posting on the Foswiki Blog:
    "http://blog.foswiki.org/feed/"
    limit="1"
    header="<div class='alt'>$n"
-   format="---+!! <div class='foswikiGrayText foswikiRight foswikiNormal'>$issued</div> [[$link][$title]]
+   format="---+!! <div class='foswikiGrayText foswikiRight foswikiNormal'>$date</div> [[$link][$title]]
            $content"
    footer="$n</div>"
 }%
@@ -50,7 +50,7 @@ Format the most recent posting on the Foswiki Blog:
 
 | *Parameter* | *Description* | *Default* |
 | ="..."= or =href="..."= | source url; this can either be a direct link to the RSS/ATOM feed or to the website serving the feed in which case you need to enable =discover= | |
-| =refresh="..."= | refresh rate for caching the feed; this can be specified using an expiry term such as =1 d= for one day or =1 h= for one hour etc | specified in =$Foswiki::cfg{FeedPlugin}{CacheExpire}=, defaults to =1 d= | 
+| =expire="..."= or =refresh="..."= | refresh rate for caching the feed; this can be specified using an expiry term such as =1 d= for one day or =1 h= for one hour etc | specified in =$Foswiki::cfg{FeedPlugin}{CacheExpire}=, defaults to =1 d= | 
 | =limit="..."= | maximum items to show | 0 (no limit) |
 | =skip="..."= | number of items in the feed to skip showing the rest | 0 |
 | =header="..."= | format string to be prepended to the list of items in the feed | |
@@ -70,6 +70,7 @@ The =format= parameter may contain the following variables expanding to respecti
    * =$id=
    * =$index=
    * =$issued=, =$issued(&lt;date-format>)=
+   * =$date=, =$date(&lt;date-format>)=
    * =$link=
    * =$modified=, =$modified($lt;date-format>)=
    * =$summary=
@@ -104,6 +105,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+| 28 May 2018 | support =$date= as a synonym for =$issued=, added =expire= parameter (basically an alias for =refresh= but more intuitive); supports Foswiki's standard proxy/noproxy settings | 
 | 24 Apr 2016 | fixed docu; fixed discover mode; added support for non-unicode Foswiki engines |
 | 18 Mar 2016 | be more robust on feeds not publishing proper dates |
 | 16 Mar 2016 | initial release |
@@ -114,7 +116,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 %META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Copyright" title="Copyright" value="2016, Michael Daum, All Rights Reserved"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2016-2018, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
 %META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25$ROOTMODULE%25"}%

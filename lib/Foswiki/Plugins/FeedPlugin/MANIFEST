@@ -1,3 +1,4 @@
+!noci
 data/System/FeedPlugin.txt 0644
 lib/Foswiki/Plugins/FeedPlugin/Config.spec 0644
 lib/Foswiki/Plugins/FeedPlugin/Core.pm 0644
