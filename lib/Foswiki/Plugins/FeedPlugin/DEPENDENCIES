@@ -1,5 +1,2 @@
-XML::Feed,>=0.53,cpan,Required.
-LWP::UserAgent,>=0,cpan,Required.
-Cache::Cache,>=0,cpan,Required.
-Digest::MD5,>=0,cpan,Required.
-URI,>=0,cpan,Required.
+Foswiki::Contrib::CacheContrib,>=0,perl,Required
+XML::Feed,>=0.53,cpan,Required

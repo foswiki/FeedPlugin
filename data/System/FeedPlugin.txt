@@ -105,6 +105,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+| 20 Oct 2020 | use Foswiki:Extensions/CacheContrib instead of local caching code |
 | 28 May 2018 | support =$date= as a synonym for =$issued=, added =expire= parameter (basically an alias for =refresh= but more intuitive); supports Foswiki's standard proxy/noproxy settings | 
 | 24 Apr 2016 | fixed docu; fixed discover mode; added support for non-unicode Foswiki engines |
 | 18 Mar 2016 | be more robust on feeds not publishing proper dates |
@@ -116,7 +117,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 %META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Copyright" title="Copyright" value="2016-2018, Michael Daum, All Rights Reserved"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2016-2020, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
 %META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25$ROOTMODULE%25"}%

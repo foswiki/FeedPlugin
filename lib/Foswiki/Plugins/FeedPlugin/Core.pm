@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# FeedPlugin is Copyright (C) 2016 Michael Daum http://michaeldaumconsulting.com
+# FeedPlugin is Copyright (C) 2016-2020 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,11 +20,9 @@ use warnings;
 
 use Foswiki::Func ();
 use Foswiki::Time ();
+use Foswiki::Contrib::CacheContrib ();
 use XML::Feed();
-use URI ();
 use Encode ();
-use Cache::FileCache ();
-use Digest::MD5 ();
 use Error qw(:try);
 
 use constant TRACE => 0; # toggle me
@@ -45,10 +43,6 @@ sub new {
   my $class = shift;
 
   my $this = bless({
-    cacheExpire => $Foswiki::cfg{FeedPlugin}{CacheExpire} || '1 d',
-    cacheDir => Foswiki::Func::getWorkArea('FeedPlugin').'/cache',
-    timeout => $Foswiki::cfg{FeedPlugin}{TimeOut} || 10,
-    agent => $Foswiki::cfg{FeedPlugin}{Agent} || 'Mozilla/5.0',
     @_
   }, $class);
 
@@ -62,142 +56,6 @@ sub _writeDebug {
 
 sub _inlineError {
   return "<span class='foswikiAlert'>".$_[0]."</span>";
-}
-
-sub _cache {
-  my $this = shift;
-
-  unless ($this->{cache}) {
-    $this->{cache} = new Cache::FileCache({
-      default_expires_in => $this->{cacheExpire},
-      cache_root 	=> $this->{cacheDir},
-      directory_umask => 077,
-    });
-  }
-
-  return $this->{cache};
-}
-
-=begin TML
-
----++ clearCache()
-
-=cut
-
-sub clearCache {
-  my $this = shift;
-
-  $this->_cache->clear;
-}
-
-=begin TML
-
----++ purgeCache()
-
-=cut
-
-sub purgeCache {
-  my $this = shift;
-
-  $this->_cache->purge;
-}
-
-=begin TML
-
----++ getExternalResource($url, $expire) -> ($content, $type)
-
-=cut
-
-sub getExternalResource {
-  my ($this, $url, $expire) = @_;
-
-  my $cache = $this->_cache;
-  my $content;
-  my $contentType;
-
-  $url =~ s/\/$//;
-
-  my $bucket = $cache->get(_cache_key($url));
-
-  if (defined $bucket) {
-    $content = $bucket->{content};
-    $contentType = $bucket->{type};
-    _writeDebug("found content for $url in cache contentType=$contentType");
-  }
-
-  unless (defined $content) { 
-    my $client = $this->_client;
-    my $res = $client->get($url);
-
-    throw Error::Simple("error fetching url") 
-      unless $res;
-
-    unless ($res->is_success) {
-      _writeDebug("url=$url, http error=".$res->status_line);
-      throw Error::Simple("http error fetching $url: ".$res->code." - ".$res->status_line);
-    }
-
-    _writeDebug("http status=".$res->status_line);
-
-    $content = $res->decoded_content();
-    $contentType = $res->header('Content-Type');
-    _writeDebug("content type=$contentType");
-
-    _writeDebug("caching content for $url");
-    $cache->set(_cache_key($url), {content => $content, type => $contentType}, $expire);
-  }
-
-  return ($content, $contentType) if wantarray;
-  return $content;
-}
-
-sub _client {
-  my $this = shift;
-
-  unless (defined $this->{client}) {
-    require LWP::UserAgent;
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($this->{timeout});
-    $ua->agent($this->{agent});
-
-    my $attachLimit = Foswiki::Func::getPreferencesValue('ATTACHFILESIZELIMIT') || 0;
-    $attachLimit =~ s/[^\d]//g;
-    if ($attachLimit) {
-      $attachLimit *= 1024;
-      $ua->max_size($attachLimit);
-    }
-
-    my $proxy = $Foswiki::cfg{PROXY}{HOST};
-    if ($proxy) {
-      $ua->proxy([ 'http', 'https' ], $proxy);
-
-      my $proxySkip = $Foswiki::cfg{PROXY}{NoProxy};
-      if ($proxySkip) {
-        my @skipDomains = split(/\s*,\s*/, $proxySkip);
-        $ua->no_proxy(@skipDomains);
-      }
-    }
-
-    $ua->ssl_opts(
-      verify_hostname => 0,    # SMELL
-    );
-
-    $this->{client} = $ua;
-  }
-
-  return $this->{client}
-}
-
-sub _cache_key {
-  return _untaint(Digest::MD5::md5_hex($_[0]));
-}
-
-sub _untaint {
-  my $content = shift;
-  if (defined $content && $content =~ /^(.*)$/s) {
-    $content = $1;
-  }
-  return $content;
 }
 
 =begin TML
@@ -227,19 +85,27 @@ sub FEED {
 
   my $request = Foswiki::Func::getRequestObject();
   my $doRefresh = $request->param("refresh") || '';
-  $this->_cache->remove(_cache_key($url)) if $doRefresh =~ /^(on|feed)$/;
-  my $expire = $params->{expire} // $params->{refresh};
+  Foswiki::Contrib::CacheContrib::getCache("UserAgent")->remove($url) if $doRefresh =~ /^(on|feed)$/;
 
   my $error;
-  my $text;
+  my $res;
   try {
-    $text = $this->getExternalResource($url, $expire);
-  }
-  catch Error::Simple with {
+    $res = Foswiki::Contrib::CacheContrib::getExternalResource($url);
+
+    throw Error::Simple("error fetching url") 
+      unless $res;
+
+    unless ($res->is_success) {
+      _writeDebug("url=$url, http error=".$res->status_line);
+      throw Error::Simple("http error fetching $url: ".$res->code." - ".$res->status_line);
+    }
+
+  } catch Error::Simple with {
     $error = shift;
   };
   return _inlineError($error) if defined $error;
 
+  my $text = $res->decoded_content();
   my $feed = XML::Feed->parse(\$text) or return _inlineError("Error: ". XML::Feed->errstr);;
 
   my $format = $params->{format} || '   * [[$link][$title]]$n';
