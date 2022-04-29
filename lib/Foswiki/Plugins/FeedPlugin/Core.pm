@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# FeedPlugin is Copyright (C) 2016-2020 Michael Daum http://michaeldaumconsulting.com
+# FeedPlugin is Copyright (C) 2016-2022 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,7 +23,9 @@ use Foswiki::Time ();
 use Foswiki::Contrib::CacheContrib ();
 use XML::Feed();
 use Encode ();
+use HTML::Entities ();
 use Error qw(:try);
+#use Data::Dump qw(dump);
 
 use constant TRACE => 0; # toggle me
 
@@ -58,6 +60,10 @@ sub _inlineError {
   return "<span class='foswikiAlert'>".$_[0]."</span>";
 }
 
+sub _ua {
+  return Foswiki::Contrib::CacheContrib::getUserAgent("FeedPlugin");
+}
+
 =begin TML
 
 ---++ FEED()
@@ -83,14 +89,17 @@ sub FEED {
     $url = shift @feeds;
   } 
 
+  my $expire = $params->{refresh} // $params->{expire} // $Foswiki::cfg{FeedPlugin}{CacheExpire} // "1 d";
+
   my $request = Foswiki::Func::getRequestObject();
   my $doRefresh = $request->param("refresh") || '';
-  Foswiki::Contrib::CacheContrib::getCache("UserAgent")->remove($url) if $doRefresh =~ /^(on|feed)$/;
+  my $cache = _ua->getCache($expire);
+  $cache->remove($url) if $doRefresh =~ /^(on|feed)$/;
 
   my $error;
   my $res;
   try {
-    $res = Foswiki::Contrib::CacheContrib::getExternalResource($url);
+    $res = _ua->get($url);
 
     throw Error::Simple("error fetching url") 
       unless $res;
@@ -106,7 +115,17 @@ sub FEED {
   return _inlineError($error) if defined $error;
 
   my $text = $res->decoded_content();
-  my $feed = XML::Feed->parse(\$text) or return _inlineError("Error: ". XML::Feed->errstr);;
+  $text = HTML::Entities::decode_entities($text) if Foswiki::Func::isTrue($params->{decode});
+  my $since = _parseTime($params->{since} // 0);
+
+  my $feed;
+  try {
+    $feed = XML::Feed->parse(\$text) or $error = XML::Feed->errstr;
+  } otherwise {
+    $error = shift;
+    $error =~ s/ at .*$//;
+  };
+  return _inlineError("Error parsing feed: $error") if defined $error;
 
   my $format = $params->{format} || '   * [[$link][$title]]$n';
   my $header = $params->{header} || '';
@@ -114,37 +133,46 @@ sub FEED {
   my $separator = $params->{separator} || '';
   my $limit = $params->{limit} || 0;
   my $skip = $params->{skip} || 0;
+  my $exclude = $params->{exclude};
+  my $include = $params->{include};
 
   my @result = ();
   my $index = 0;
   foreach my $entry ($feed->entries) {
     $index++;
+    my $title = _decode($entry->title);
+
+    next if $exclude && $title =~ /$exclude/;
+    next if $include && $title !~ /$include/;
+
     last if $limit && $index > ($limit+$skip);
     next if $skip && $index <= $skip;
-    my $line = $format;
 
-    my $category = _encode(join(", ", $entry->category()) || '');
-    my $tags = _encode(join(", ", $entry->tags()) || '');
-    my $content = "<noautolink>"._encode($entry->content->body())."</noautolink>";
-    my $summary = _encode($entry->summary->body());
+    my $line = $format;
+    my $category = _decode(join(", ", $entry->category()) || '');
+    my $tags = _decode(join(", ", $entry->tags()) || '');
+    my $content = "<noautolink>"._decode($entry->content->body())."</noautolink>";
+    my $summary = _decode($entry->summary->body()) // '';
     my $issued = $entry->issued;
     $issued = $issued->epoch if defined $issued;
     my $modified = $entry->modified;
     $modified = $modified->epoch if defined $modified;
 
-    $line =~ s/\$author/_encode($entry->author)/ge;
-    $line =~ s/\$base/_encode($entry->base)/ge;
-    $line =~ s/\$category/$category/g;
-    $line =~ s/\$content/$content/g;
-    $line =~ s/\$id/_encode($entry->id)/ge;
-    $line =~ s/\$index/$index/g;
-    $line =~ s/\$(?:issued|date)(?:\((.*?)\))?/defined($issued)?Foswiki::Time::formatTime($issued, $1 || '$day $month $year'):""/ge;
-    $line =~ s/\$link/_encode($entry->link)/ge;
-    $line =~ s/\$modified(?:\((.*?)\))?/defined($modified)?Foswiki::Time::formatTime($modified, $1 || '$day $month $year'):""/ge;
-    $line =~ s/\$summary/$summary/g;
-    $line =~ s/\$tags/$tags/g;
-    $line =~ s/\$title/_encode($entry->title)/ge;
+    next if $since && $issued && $issued < $since;
+    next if $since && $modified && $modified < $since;
 
+    $line =~ s/\$author\b/_decode($entry->author)/ge;
+    $line =~ s/\$base\b/_decode($entry->base)/ge;
+    $line =~ s/\$category\b/$category/g;
+    $line =~ s/\$content\b/$content/g;
+    $line =~ s/\$id\b/_decode($entry->id)/ge;
+    $line =~ s/\$index\b/$index/g;
+    $line =~ s/\$(?:issued|date)(?:\((.*?)\))?/defined($issued)?Foswiki::Time::formatTime($issued, $1 || '$day $month $year'):""/ge;
+    $line =~ s/\$link\b/_decode($entry->link)/ge;
+    $line =~ s/\$modified(?:\((.*?)\))?/defined($modified)?Foswiki::Time::formatTime($modified, $1 || '$day $month $year'):""/ge;
+    $line =~ s/\$summary\b/$summary/g;
+    $line =~ s/\$tags\b/$tags/g;
+    $line =~ s/\$title\b/$title/g;
     $line =~ s/%(\w)/%<nop>$1/g;
     push @result, $line;
   }
@@ -152,25 +180,43 @@ sub FEED {
 
   my $result = $header.join($separator, @result).$footer;
 
-  $result =~ s/\$feed_author/_encode($feed->author)/ge;
-  $result =~ s/\$feed_base/_encode($feed->base)/ge;
-  $result =~ s/\$feed_copyright/_encode($feed->copyright)/ge;
-  $result =~ s/\$feed_format/_encode($feed->format)/ge;
-  $result =~ s/\$feed_generator/_encode($feed->generator)/ge;
-  $result =~ s/\$feed_language/_encode($feed->language)/ge;
-  $result =~ s/\$feed_link/_encode($feed->link)/ge;
-  $result =~ s/\$feed_modified/_encode($feed->modified)/ge;
+  $result =~ s/\$feed_author/_decode($feed->author)/ge;
+  $result =~ s/\$feed_base/_decode($feed->base)/ge;
+  $result =~ s/\$feed_copyright/_decode($feed->copyright)/ge;
+  $result =~ s/\$feed_format/_decode($feed->format)/ge;
+  $result =~ s/\$feed_generator/_decode($feed->generator)/ge;
+  $result =~ s/\$feed_language/_decode($feed->language)/ge;
+  $result =~ s/\$feed_link/_decode($feed->link)/ge;
+  $result =~ s/\$feed_modified/_decode($feed->modified)/ge;
   $result =~ s/\$feed_modified(?:\((.*?)\))?/Foswiki::Time::formatTime($feed->modified->epoch, $1 || '$day $month $year')/ge;
-  $result =~ s/\$feed_tagline/_encode($feed->tagline)/ge;
-  $result =~ s/\$feed_title/_encode($feed->title)/ge;
+  $result =~ s/\$feed_tagline/_decode($feed->tagline)/ge;
+  $result =~ s/\$feed_title/_decode($feed->title)/ge;
 
   return Foswiki::Func::decodeFormatTokens($result);
 }
 
+sub _parseTime {
+  my $string = shift;
+
+  return unless defined $string;
+  return $string if $string =~ /^\d+$/;
+  return Foswiki::Time::parseTime($string, undef, {lang => "en"});
+}
+
+sub _decode {
+  my $string = shift;
+
+  return "" unless defined $string;
+return $string; ### SMELL
+
+  return Encode::decode_utf8($string);
+}
+
 sub _encode {
   my $string = shift;
-  $string = Encode::encode($Foswiki::cfg{Site}{CharSet}, $string) unless $Foswiki::UNICODE;
-  return $string;
+
+  return "" unless defined $string;
+  return Encode::encode_utf8($string);
 }
 
 1;

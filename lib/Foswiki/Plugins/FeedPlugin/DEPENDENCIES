@@ -1,2 +1,3 @@
 Foswiki::Contrib::CacheContrib,>=0,perl,Required
 XML::Feed,>=0.53,cpan,Required
+HTML::Entities,>=0,cpan,required

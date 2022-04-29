@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="" date="1461667167" format="1.1"  version="1"}%
+%META:TOPICINFO{author="micha" comment="reprev" date="1626170466" format="1.1" reprev="2" version="2"}%
 ---+!! %TOPIC%
 %FORMFIELD{"Description"}%
 
@@ -15,7 +15,7 @@ List headlines at http://blog.foswiki.org; auto-discover news feed:
 <verbatim class="tml">
 %STARTSECTION{"example1"}%
 %FEED{
-   "http://blog.foswiki.org" 
+   "https://blog.foswiki.org" 
    discover="on"
    header="<div class='alt'>$n"
    footer="$n</div>"
@@ -23,16 +23,12 @@ List headlines at http://blog.foswiki.org; auto-discover news feed:
 %ENDSECTION{"example1"}%
 </verbatim>
 
-%IF{"context FeedPluginEnabled"
-   then="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"example1\"}$percnt"
-}%
-
 Format the most recent posting on the Foswiki Blog:
 
 <verbatim class="tml">
 %STARTSECTION{"example2"}%
 %FEED{
-   "http://blog.foswiki.org/feed/"
+   "https://blog.foswiki.org/Blog/WebRss"
    limit="1"
    header="<div class='alt'>$n"
    format="---+!! <div class='foswikiGrayText foswikiRight foswikiNormal'>$date</div> [[$link][$title]]
@@ -41,10 +37,6 @@ Format the most recent posting on the Foswiki Blog:
 }%
 %ENDSECTION{"example2"}%
 </verbatim>
-
-%IF{"context FeedPluginEnabled"
-   then="$percntINCLUDE{\"%WEB%.%TOPIC%\" section=\"example2\"}$percnt"
-}%
 
 ---++ Syntax
 
@@ -58,6 +50,9 @@ Format the most recent posting on the Foswiki Blog:
 | =footer="..."= | format string to be appended to the list of items in the feed | |
 | =separator="..."= | format string to separte items in the feed | |
 | =discover="on/off"= | switch on feed discovery starting at the source url | =off= |
+| =decode="on/off"= | switch on entity decoding of the feed before parsing it | =off= |
+| =exclude="..."= | regular expression of items not to be included | |
+| =include="..."= | regular expression of items to be included | |
 
 An empty result will be returned when no items have been found in the feed (or all items have been skipped).
 
@@ -105,6 +100,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+| 28 Apr 2022 | added parameter to decode html entities; added =include= and =exclude= parameters |
 | 20 Oct 2020 | use Foswiki:Extensions/CacheContrib instead of local caching code |
 | 28 May 2018 | support =$date= as a synonym for =$issued=, added =expire= parameter (basically an alias for =refresh= but more intuitive); supports Foswiki's standard proxy/noproxy settings | 
 | 24 Apr 2016 | fixed docu; fixed discover mode; added support for non-unicode Foswiki engines |
@@ -117,7 +113,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 %META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Copyright" title="Copyright" value="2016-2020, Michael Daum, All Rights Reserved"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2016-2022, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
 %META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25$ROOTMODULE%25"}%
