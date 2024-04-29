@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# FeedPlugin is Copyright (C) 2016-2022 Michael Daum http://michaeldaumconsulting.com
+# FeedPlugin is Copyright (C) 2016-2024 Michael Daum http://michaeldaumconsulting.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,9 +20,10 @@ use warnings;
 
 use Foswiki::Func ();
 
-our $VERSION = '2.10';
-our $RELEASE = '28 Apr 2022';
+our $VERSION = '3.00';
+our $RELEASE = '%$RELEASE%';
 our $SHORTDESCRIPTION = 'Syndication feed parser';
+our $LICENSECODE = '%$LICENSECODE%';
 our $NO_PREFS_IN_TOPIC = 1;
 our $core;
 
@@ -40,7 +41,6 @@ sub getCore {
   }
   return $core;
 }
-
 
 sub finishPlugin {
   undef $core;

@@ -1,10 +1,10 @@
-%META:TOPICINFO{author="micha" comment="reprev" date="1626170466" format="1.1" reprev="2" version="2"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1626170466" format="1.1" version="1"}%
 ---+!! %TOPIC%
 %FORMFIELD{"Description"}%
 
 %TOC%
 
-This is a new plugin to render RSS and ATOM feeds from internet sites. It actually is a rework of the old [[Foswiki:Extensions/HeadnlinesPlugin][HeadlinesPlugin]]
+This is a new plugin to render RSS and ATOM feeds from internet sites. It actually is a rework of the old [[https://foswiki.org/Extensions/HeadnlinesPlugin][HeadlinesPlugin]]
 now much leaner and more robust, i.e. facing unicode website feeds. Instead of implementing a RSS parser by its own %TOPIC% hands off duties to CPAN:XML::Feeed 
 and only takes care of caching and integrating results on a Foswiki page.
 
@@ -53,6 +53,7 @@ Format the most recent posting on the Foswiki Blog:
 | =decode="on/off"= | switch on entity decoding of the feed before parsing it | =off= |
 | =exclude="..."= | regular expression of items not to be included | |
 | =include="..."= | regular expression of items to be included | |
+| =since="..."= | return entries in feed newer than the given time | |
 
 An empty result will be returned when no items have been found in the feed (or all items have been skipped).
 
@@ -100,12 +101,13 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
-| 28 Apr 2022 | added parameter to decode html entities; added =include= and =exclude= parameters |
-| 20 Oct 2020 | use Foswiki:Extensions/CacheContrib instead of local caching code |
-| 28 May 2018 | support =$date= as a synonym for =$issued=, added =expire= parameter (basically an alias for =refresh= but more intuitive); supports Foswiki's standard proxy/noproxy settings | 
-| 24 Apr 2016 | fixed docu; fixed discover mode; added support for non-unicode Foswiki engines |
-| 18 Mar 2016 | be more robust on feeds not publishing proper dates |
-| 16 Mar 2016 | initial release |
+|  29 Apr 2024 | rework of internal api for better integration in upcoming <nop>MastodonPlugin |
+|  28 Apr 2022 | added parameter to decode html entities; added =include= and =exclude= parameters |
+|  20 Oct 2020 | use Foswiki:Extensions/CacheContrib instead of local caching code |
+|  28 May 2018 | support =$date= as a synonym for =$issued=, added =expire= parameter (basically an alias for =refresh= but more intuitive); supports Foswiki's standard proxy/noproxy settings | 
+|  24 Apr 2016 | fixed docu; fixed discover mode; added support for non-unicode Foswiki engines |
+|  18 Mar 2016 | be more robust on feeds not publishing proper dates |
+|  16 Mar 2016 | initial release |
 
 %META:FORM{name="PackageForm"}%
 %META:FIELD{name="Author" title="Author" value="Michael Daum"}%
@@ -113,7 +115,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 %META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
 %META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25$ROOTMODULE%25"}%
-%META:FIELD{name="Copyright" title="Copyright" value="2016-2022, Michael Daum, All Rights Reserved"}%
+%META:FIELD{name="Copyright" title="Copyright" value="2016-2024, Michael Daum, All Rights Reserved"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
 %META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25$ROOTMODULE%25"}%
 %META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25$ROOTMODULE%25"}%
