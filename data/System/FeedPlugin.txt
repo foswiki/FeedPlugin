@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1626170466" format="1.1" version="1"}%
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1734687335" format="1.1" version="1"}%
 ---+!! %TOPIC%
 %FORMFIELD{"Description"}%
 
@@ -101,6 +101,7 @@ In addition the =header=, =format=, =separator= and =footer= format strings may 
 ---++ Change History
 
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+|  20 Dec 2024 | hide code internals in error messages |
 |  29 Apr 2024 | rework of internal api for better integration in upcoming <nop>MastodonPlugin |
 |  28 Apr 2022 | added parameter to decode html entities; added =include= and =exclude= parameters |
 |  20 Oct 2020 | use Foswiki:Extensions/CacheContrib instead of local caching code |

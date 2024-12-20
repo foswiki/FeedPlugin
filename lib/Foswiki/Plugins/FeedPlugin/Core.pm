@@ -84,6 +84,7 @@ sub FEED {
     $feed = $this->getFeed($params);
   } catch Error::Simple with {
     $error = shift;
+    $error =~ s/ at .*$//s;
   };
   return _inlineError($error) if defined $error;
 
